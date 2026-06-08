@@ -41,9 +41,12 @@ jobs:
               title: "🚨 BUG DETECTED IN CODE",
               body: `
 A bug was detected in the latest push.
+
 ### Details:
 - Workflow: Bug Detection
 - Status: FAILED ❌
 - Commit: ${context.sha}
+
 👉 Please fix the issue and push again.
+              `
             })
