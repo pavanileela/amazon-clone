@@ -1,0 +1,49 @@
+name: Bug Detection Auto Issue
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Fake Test (Example)
+        id: test_step
+        run: |
+          echo "Running tests..."
+
+          # SIMULATED BUG CHECK
+          if grep -q "BUG" index.html; then
+            echo "Test Failed ❌"
+            exit 1
+          else
+            echo "Test Passed ✅"
+          fi
+
+  create_issue_on_failure:
+    needs: test
+    runs-on: ubuntu-latest
+    if: failure()   # 👈 ONLY RUNS IF TEST FAILS
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create GitHub Issue on Bug
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "🚨 BUG DETECTED IN CODE",
+              body: `
+A bug was detected in the latest push.
+### Details:
+- Workflow: Bug Detection
+- Status: FAILED ❌
+- Commit: ${context.sha}
+👉 Please fix the issue and push again.
+            })
